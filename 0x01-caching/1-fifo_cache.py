@@ -23,13 +23,17 @@ class FIFOCache(BaseCaching):
         """
         assign to the dict self.cache_data the item value for key
         """
-        self.cache_data[key] = item
         if key is None or item is None:
             pass
+        else:
+            length = len(self.cache_data)
+            if length >= BaseCaching.MAX_ITEMS and key not in self.cache_data:
+                print("DISCARD: {}".format(self.order[0]))
+                del self.cache_data[self.order[0]]
+                del self.order[0]
+            self.order.append(key)
+            self.cache_data[key] = item
 
-        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
-            first_key, _ = self.cache_data.popitem(last=False)
-            print(f"DISCARD: {first_key}")
 
     def get(self, key):
         """
