@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-FIFO caching module
+Least recently used caching module
 """
 
 
@@ -8,9 +8,9 @@ from base_caching import BaseCaching
 from collections import OrderedDict
 
 
-class FIFOCache(BaseCaching):
+class LRUCache(BaseCaching):
     """
-    Caching system
+    Least recently used Caching system
     """
     def __init__(self):
         """
@@ -25,14 +25,17 @@ class FIFOCache(BaseCaching):
         """
         if key is None or item is None:
             return
+        if key not in self.cache_data:
+            if len(self.cache_data) + 1 > BaseCaching.MAX_ITEMS:
+                lru_key, _ = self.cache_data.popitem(True)
+                print("DISCARD:", lru_key)
         self.cache_data[key] = item
-
-        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
-            first_key, _ = self.cache_data.popitem(last=False)
-            print(f"DISCARD: {first_key}")
+        self.cache_data.move_to_end(key, last=False)
 
     def get(self, key):
         """
         return the value in self.cache_data linked to key
         """
-        return self.cache_data.get(key, None)
+        if key is not None and key in self.cache_data.keys():
+            return self.cache_data[key]
+        return None
